@@ -1,0 +1,806 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: PT Vincent Dashboard API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: auth
+    description: Authentication
+  - name: users
+    description: User management
+  - name: tools
+    description: Tools & integrations
+  - name: logs
+    description: Activity logs
+  - name: stats
+    description: Dashboard stats
+  - name: anime
+    description: Anime tools
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+
+  /users:
+    get:
+      operationId: listUsers
+      tags: [users]
+      summary: List all users
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+    post:
+      operationId: createUser
+      tags: [users]
+      summary: Create user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/{id}:
+    get:
+      operationId: getUser
+      tags: [users]
+      summary: Get user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    patch:
+      operationId: updateUser
+      tags: [users]
+      summary: Update user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    delete:
+      operationId: deleteUser
+      tags: [users]
+      summary: Delete user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+
+  /users/{id}/ban:
+    post:
+      operationId: banUser
+      tags: [users]
+      summary: Ban or unban user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BanInput"
+      responses:
+        "200":
+          description: User ban status updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /tools:
+    get:
+      operationId: listTools
+      tags: [tools]
+      summary: List available tools
+      responses:
+        "200":
+          description: Tools list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tool"
+
+  /tools/download:
+    post:
+      operationId: downloadMedia
+      tags: [tools]
+      summary: Download social media video/audio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DownloadInput"
+      responses:
+        "200":
+          description: Download result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DownloadResult"
+
+  /tools/ig-stalk:
+    post:
+      operationId: igStalk
+      tags: [tools]
+      summary: Instagram account info
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IgStalkInput"
+      responses:
+        "200":
+          description: Instagram info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IgStalkResult"
+
+  /tools/phone-lookup:
+    post:
+      operationId: phoneLookup
+      tags: [tools]
+      summary: Phone number lookup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PhoneLookupInput"
+      responses:
+        "200":
+          description: Phone lookup result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PhoneLookupResult"
+
+  /tools/ngl-spam:
+    post:
+      operationId: nglSpam
+      tags: [tools]
+      summary: NGL mass message sender (simulation)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NglSpamInput"
+      responses:
+        "200":
+          description: Spam result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimResult"
+
+  /tools/fake-dana:
+    post:
+      operationId: fakeDana
+      tags: [tools]
+      summary: Fake DANA balance generator (simulation)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FakeDanaInput"
+      responses:
+        "200":
+          description: Result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimResult"
+
+  /tools/whatsapp-badak:
+    post:
+      operationId: whatsappBadak
+      tags: [tools]
+      summary: WhatsApp Badak system (simulation)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BadakInput"
+      responses:
+        "200":
+          description: Result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimResult"
+
+  /tools/nik-check:
+    post:
+      operationId: nikCheck
+      tags: [tools]
+      summary: NIK KTP check (simulation)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NikInput"
+      responses:
+        "200":
+          description: Result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimResult"
+
+  /tools/chat-ai:
+    post:
+      operationId: chatAi
+      tags: [tools]
+      summary: Chat AI assistant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatAiInput"
+      responses:
+        "200":
+          description: AI response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimResult"
+
+  /tools/web-blast:
+    post:
+      operationId: webBlast
+      tags: [tools]
+      summary: Web blast link collection (simulation)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebBlastInput"
+      responses:
+        "200":
+          description: Result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimResult"
+
+  /tools/meta-bisnis:
+    post:
+      operationId: metaBisnis
+      tags: [tools]
+      summary: Meta Business WA verification (simulation)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MetaBisnisInput"
+      responses:
+        "200":
+          description: Result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimResult"
+
+  /anime/search:
+    get:
+      operationId: searchAnime
+      tags: [anime]
+      summary: Search anime
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AnimeItem"
+
+  /anime/trending:
+    get:
+      operationId: getTrendingAnime
+      tags: [anime]
+      summary: Get trending anime
+      responses:
+        "200":
+          description: Trending anime
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AnimeItem"
+
+  /logs:
+    get:
+      operationId: listLogs
+      tags: [logs]
+      summary: List activity logs
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: userId
+          in: query
+          required: false
+          schema:
+            type: ["integer", "null"]
+      responses:
+        "200":
+          description: Logs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityLog"
+
+  /stats:
+    get:
+      operationId: getStats
+      tags: [stats]
+      summary: Dashboard statistics
+      responses:
+        "200":
+          description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    LoginInput:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    AuthResponse:
+      type: object
+      required: [user, token]
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        token:
+          type: string
+
+    User:
+      type: object
+      required: [id, username, role, status, createdAt]
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        role:
+          type: string
+          enum: [admin, reseller, user]
+        status:
+          type: string
+          enum: [active, banned, expired]
+        expiredAt:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        lastLogin:
+          type: ["string", "null"]
+        note:
+          type: ["string", "null"]
+
+    UserInput:
+      type: object
+      required: [username, password, role]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum: [admin, reseller, user]
+        expiredAt:
+          type: ["string", "null"]
+        note:
+          type: ["string", "null"]
+
+    UserUpdate:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: ["string", "null"]
+        role:
+          type: string
+          enum: [admin, reseller, user]
+        status:
+          type: string
+          enum: [active, banned, expired]
+        expiredAt:
+          type: ["string", "null"]
+        note:
+          type: ["string", "null"]
+
+    BanInput:
+      type: object
+      required: [banned]
+      properties:
+        banned:
+          type: boolean
+
+    Tool:
+      type: object
+      required: [id, name, description, category, isReal]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        isReal:
+          type: boolean
+        icon:
+          type: string
+
+    DownloadInput:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+
+    DownloadResult:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+        title:
+          type: ["string", "null"]
+        thumbnail:
+          type: ["string", "null"]
+        downloadUrl:
+          type: ["string", "null"]
+        quality:
+          type: ["string", "null"]
+        platform:
+          type: ["string", "null"]
+        error:
+          type: ["string", "null"]
+
+    IgStalkInput:
+      type: object
+      required: [username]
+      properties:
+        username:
+          type: string
+
+    IgStalkResult:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+        username:
+          type: ["string", "null"]
+        fullName:
+          type: ["string", "null"]
+        bio:
+          type: ["string", "null"]
+        followers:
+          type: ["integer", "null"]
+        following:
+          type: ["integer", "null"]
+        posts:
+          type: ["integer", "null"]
+        isPrivate:
+          type: ["boolean", "null"]
+        profilePic:
+          type: ["string", "null"]
+        error:
+          type: ["string", "null"]
+
+    PhoneLookupInput:
+      type: object
+      required: [phone]
+      properties:
+        phone:
+          type: string
+
+    PhoneLookupResult:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+        phone:
+          type: ["string", "null"]
+        operator:
+          type: ["string", "null"]
+        region:
+          type: ["string", "null"]
+        isValid:
+          type: ["boolean", "null"]
+        error:
+          type: ["string", "null"]
+
+    NglSpamInput:
+      type: object
+      required: [targetUrl, message, count]
+      properties:
+        targetUrl:
+          type: string
+        message:
+          type: string
+        count:
+          type: integer
+
+    FakeDanaInput:
+      type: object
+      required: [name, amount]
+      properties:
+        name:
+          type: string
+        amount:
+          type: string
+
+    BadakInput:
+      type: object
+      required: [targetNumber, method]
+      properties:
+        targetNumber:
+          type: string
+        method:
+          type: string
+
+    NikInput:
+      type: object
+      required: [nik]
+      properties:
+        nik:
+          type: string
+
+    ChatAiInput:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+
+    WebBlastInput:
+      type: object
+      required: [target]
+      properties:
+        target:
+          type: string
+
+    MetaBisnisInput:
+      type: object
+      required: [phone]
+      properties:
+        phone:
+          type: string
+
+    SimResult:
+      type: object
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: ["object", "null"]
+
+    AnimeItem:
+      type: object
+      required: [id, title]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        image:
+          type: ["string", "null"]
+        score:
+          type: ["number", "null"]
+        year:
+          type: ["integer", "null"]
+        type:
+          type: ["string", "null"]
+        synopsis:
+          type: ["string", "null"]
+        episodes:
+          type: ["integer", "null"]
+
+    ActivityLog:
+      type: object
+      required: [id, action, createdAt]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: ["integer", "null"]
+        username:
+          type: ["string", "null"]
+        action:
+          type: string
+        detail:
+          type: ["string", "null"]
+        ip:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    DashboardStats:
+      type: object
+      required: [totalUsers, activeUsers, bannedUsers, onlineUsers, totalLogs, toolsUsed]
+      properties:
+        totalUsers:
+          type: integer
+        activeUsers:
+          type: integer
+        bannedUsers:
+          type: integer
+        onlineUsers:
+          type: integer
+        totalLogs:
+          type: integer
+        toolsUsed:
+          type: integer
+        recentActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActivityLog"
+        popularTools:
+          type: array
+          items:
+            type: object
+            required: [toolId, count]
+            properties:
+              toolId:
+                type: string
+              toolName:
+                type: string
+              count:
+                type: integer

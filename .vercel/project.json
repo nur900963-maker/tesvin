@@ -1,0 +1,16 @@
+{
+  "projectId": "prj_WmFExyxZr8BtF3TrOltNcodzfMJj",
+  "orgId": "team_61OYvB3ho4JwvbIwLdVzBA3B",
+  "projectName": "vincent-world",
+  "settings": {
+    "createdAt": 1782255558811,
+    "framework": "vite",
+    "devCommand": null,
+    "installCommand": "pnpm install --prod=false",
+    "buildCommand": "pnpm --filter @workspace/dashboard run build",
+    "outputDirectory": "artifacts/dashboard/dist/public",
+    "rootDirectory": null,
+    "directoryListing": false,
+    "nodeVersion": "22.x"
+  }
+}
