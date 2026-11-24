@@ -1,0 +1,10 @@
+{
+  "name": "vincent-world",
+  "project": "prj_WmFExyxZr8BtF3TrOltNcodzfMJj",
+  "gitSource": {
+    "type": "github",
+    "repoId": 1278554261,
+    "ref": "main"
+  },
+  "target": "production"
+}
